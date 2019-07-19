@@ -69,8 +69,7 @@
 <?php
 if(empty($top)){
 $on_top="konsultasifm.php";
-echo "<meta http-equiv='refresh' content='0; url=index.php?top=cbr1.php'>";
-}
+echo "<meta http-equiv='refresh' content='0; url=admin/index.php'>";
 else{
 $on_top=$top;
 include "$on_top";
