@@ -46,28 +46,76 @@
                     <strong>Analisa Menggunakan Sistem Pakar Metode CBR (Case Based Reasoning)</strong><br />
                     <br />
                     <?php
-                    if (!isset($_POST['button'])) {
-                        ?>
+                    if (!isset($_POST['submit'])) {
+						
+                     ?>
                         <form name="form1" method="post" action="">
                             <br>
-                            <table align="center" width="600" border="1" cellspacing="0" cellpadding="5">
-                                <tr>
-                                    <td id="ignore" bgcolor="#DBEAF5" width="300"><div align="center"><strong><font size="2" face="Arial, Helvetica, sans-serif"><font size="2">GEJALA</font> </font></strong></div></td>
-                                    <?php
-                                    $q = mysql_query("select * from gejala ORDER BY kd_pilihan"); // tampilkan semua gejala
-                                    while ($r = mysql_fetch_array($q)) {
-                                        ?>        
-                                    <tr>
-                                        <td width="600"> 
-                                            <input id="gejala<?php echo $r['kd_pilihan']; ?>" name="gejala<?php echo $r['kd_pilihan']; ?>" type="checkbox" value="true">
-                                            <?php echo $r['sub_nama']; ?></strong><br/>                
-                                        </td>
-                                    </tr>
-                                <?php } ?>	
-                                <tr>
-                                    <td><input type="submit" name="button" value="Proses"></td>
-                                </tr>
-                            </table>
+                            <table class="tab" width="528" border="0" align="center" cellpadding="4" cellspacing="1" bordercolor="#F0F0F0" bgcolor="#CCCC99">
+							<tr bgcolor="#FFFFFF">
+								<td>Tema</td>
+								<td><select name="k1" id="k1">
+									<option value="0">[Pilih Tema]</option>
+									<option value="Jawa">Jawa</option>
+									<option value="Nasional">Nasional</option>
+									<option value="Internasional">Internasional</option>
+							</select>
+							</td>
+							</tr>
+							
+                                            
+							<tr bgcolor="#FFFFFF">
+								<td>Budget</td>
+								<td><select name="k2" id="k2">
+									<option value="0">[Pilih Budget]</option>
+									<option value="Low">Low</option>
+									<option value="Medium">Meduim</option>
+									<option value="High">High</option>
+							</select></td>
+							</tr>
+							<tr bgcolor="#FFFFFF">
+								<td>Varian</td>
+								<td><select name="k3" id="k3">
+								<option value="0">[Pilih Varian Menu]</option>
+								<option value="10">10</option>
+								<option value="11">11</option>
+								<option value="12">12</option>
+								<option value="13">13</option>
+								<option value="14">14</option>
+								<option value="15">15</option>
+								<option value="16">16</option>
+								<option value="17">17</option>
+							</select></td>
+							</tr>
+							<tr bgcolor="#FFFFFF">
+								<td>Vendor</td>
+								<td><label>
+								 <select name="k4" id="k4">
+								  <option value="NULL">[ Pilih Vendor ]</option>
+								  <?php 
+							$sqlp = "SELECT * FROM data_vendor ORDER BY kd_vendor";
+							$qryp = mysql_query($sqlp, $koneksi) 
+									or die ("SQL Error: ".mysql_error());
+							while ($datap=mysql_fetch_array($qryp)) {
+								if ($datap['kd_vendor']==$kdsakit) {
+									$cek ="selected";
+								}
+								else {
+									$cek ="";
+								}
+								echo "<option value='$datap[nama_vendor]' $cek>$datap[kd_vendor]&nbsp;|&nbsp;$datap[nama_vendor]</option>";
+							}
+						  ?>
+								</select>
+								</label></td>
+												 </tr>
+							  <tr bgcolor="#FFFFFF">
+								<td>&nbsp;</td>
+								
+								 <td><input type="submit" name="submit" value="Proses"></td>
+								
+							  </tr>
+							</table>
                             <br>
                         </form>
                         <?php
@@ -87,7 +135,7 @@
                                 <?php
                                 // ---------------------------------- Mulai dari sini --------------------------------------------------------------
 
-                                $querybasiskasus = "SELECT * FROM relasi ORDER BY no_relasi, kd_paket, kd_pilihan";
+                                $querybasiskasus = "SELECT * FROM relasi ORDER BY id_relasi, kd_paket, kd_pilihan";
                                 $no_relasi = "";
 
 								$qry = mysql_query($querybasiskasus, $koneksi) 
@@ -105,7 +153,7 @@
                                     $ka = mysql_query("SELECT no_relasi, SUM(bobot) AS total FROM relasi GROUP BY no_relasi");
 
 
-                                    // $hitung = mysql_query("SELECT g.nama_gejala , sum(bk.bobot) FROM gejala g, basis_kasus bk WHERE g.kd_pilihan = '$databasiskasus[kd_pilihan]' GROUP BY g.nama_gejala");
+                                    // $hitung = mysql_query("SELECT g.nama_gejala , sum(bk.bobot) FROM gejala g, basis_kasus bk WHERE g.id_gejala = '$databasiskasus[id_gejala]' GROUP BY g.nama_gejala");
                                     $hasilhitung = mysql_fetch_array($ka);
                                     ?>
 
@@ -147,29 +195,72 @@
                             <?php // --------------------------------------------------------------------------------------------------------------------- ?>
                             <br/><br/> <strong>---------------------------------------------------------------------------------------------------------------------</strong>   <br/><br/>
                             <br/><br/> <strong> Kriteria yang Dipilih : </strong>   <br/><br/>
-                            <table width="300" border="0" cellpadding="5" cellspacing="1" bgcolor="#000099">
+                            <table width="300" border="5" cellpadding="5" cellspacing="1" bgcolor="#000099">
                                 <?php
-                                $querygejala = mysql_query("SELECT * FROM gejala ORDER BY kd_pilihan ASC");
-
-                                while ($datagejala = mysql_fetch_array($querygejala)) {
-                                    if (@$_POST['gejala' . $datagejala['kd_pilihan']] == 'true') {
+								
+								if(isset($_POST['submit'])){
+									 $k1= $_POST['k1'];
+									 $k2= $_POST['k2'];
+									 $k3= $_POST['k3'];
+									 $k4= $_POST['k4'];
+									
+                                $querygejala = "SELECT sub_nama FROM gejala WHERE sub_nama = '".$k1."'";
+								$qry = mysql_query($querygejala, $koneksi) 
+									or die ("SQL Error: ".mysql_error());
+                                while ($datakriteria = mysql_fetch_array($qry)) {
                                         ?>        
                                         <tr>
                                             <td bgcolor="#FFFFFF"> 
-                                                <?php echo $datagejala['sub_nama']; ?>
+                                                <?php echo "Tema :   ",$datakriteria['sub_nama']; ?>
+                                            </td>
+									    </tr>
+										 
+                                        <?php
+                                    }
+									$querygejala = "SELECT sub_nama FROM gejala WHERE sub_nama = '".$k2."'";
+									$qry = mysql_query($querygejala, $koneksi) 
+										or die ("SQL Error: ".mysql_error());
+									while ($datakriteria = mysql_fetch_array($qry)) {
+											?>        
+											 <tr>
+                                            <td bgcolor="#FFFFFF"> 
+                                                <?php echo "Budget :   ", $datakriteria['sub_nama']; ?>
+                                            </td>
+									    	</tr>
+											<?php
+                               		 }
+								$querygejala = "SELECT sub_nama FROM gejala WHERE sub_nama = '".$k3."'";
+								$qry = mysql_query($querygejala, $koneksi) 
+									or die ("SQL Error: ".mysql_error());
+                                while ($datakriteria = mysql_fetch_array($qry)) {
+                                        ?>        
+                                        <tr>
+                                            <td bgcolor="#FFFFFF"> 
+                                                <?php echo "Varian :   ", $datakriteria['sub_nama']; ?>
+                                            </td>
+                                        </tr>
+                                        <?php
+                                    }
+				                $querygejala = "SELECT sub_nama FROM gejala WHERE sub_nama = '".$k4."'";
+								$qry = mysql_query($querygejala, $koneksi) 
+									or die ("SQL Error: ".mysql_error());
+                                while ($datakriteria = mysql_fetch_array($qry)) {
+                                        ?>        
+                                        <tr>
+                                            <td bgcolor="#FFFFFF"> 
+                                                <?php echo "Vendor :   ", $datakriteria['sub_nama']; ?>
                                             </td>
                                         </tr>
                                         <?php
                                     }
                                 }
-                                //------------------------------------------------------------------------------------------------------------------------
-                                ?>
-                            </table> 
+								
+                           ?>	
+                          </table> 
 
-                            <br/><br/> <strong>---------------------------------------------------------------------------------------------------------------------</strong>   <br/><br/>
+                        <br/><br/> <strong>---------------------------------------------------------------------------------------------------------------------</strong><br><br/>
 
-
-                            <br/><br/>Perhitungan :<br/><br/>
+<br/><br/>Perhitungan :<br/><br/>
                             <?php
                             echo "<table width=\"700\" border=\"0\" cellpadding=\"5\" cellspacing=\"1\" >";
 
@@ -200,19 +291,16 @@
                                 $bobotcocok = 0;
 								
 								//menampilkan kriteria yang dipilih
-                                $querygejala = mysql_query("SELECT * FROM gejala ORDER BY kd_pilihan ASC");
+								    $querygejala = mysql_query("SELECT kd_pilihan FROM gejala WHERE sub_nama in ('".$k1."','".$k2."','".$k3."','".$k4."')");
                                 while ($datagejala = mysql_fetch_array($querygejala)) {
-                                    if (@$_POST['gejala' . $datagejala['kd_pilihan']] == 'true') {
+									
+                                    
 
                                      $jml_gejala_dipilih++;
 
-// cari disini                          //////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
-                                        // SELECT bk.no_kasus, sum(g.bobot) FROM basis_kasus bk, gejala g WHERE bk.no_kasus = '2' and g.id_gejala = bk.id_gejala
-                                        //$querybasiskasus = mysql_query("SELECT * , sum(g.bobot) FROM basis_kasus WHERE no_kasus = '$datakasus[no_kasus]'");
-                                        $menghitungbobot = mysql_query("SELECT bk.no_relasi, sum(g.bobot) as total FROM relasi bk, gejala g WHERE bk.no_relasi = '$datakasus[no_relasi]' and g.kd_pilihan = bk.id_pilihan");
-                                        //      $totalhasil = mysql_fetch_array($ka);
-                                        $querybasiskasus = mysql_query("SELECT * FROM relasi bk, gejala g WHERE bk.no_relasi = '$datakasus[no_relasi]' and g.kd_pilihan = bk.kd_pilihan and NOT (bobot = 0.5)");
+                                       
+                                        $menghitungbobot = mysql_query("SELECT bk.no_relasi, sum(g.bobot) as total FROM relasi bk, gejala g WHERE bk.no_relasi = '$datakasus[no_relasi]' and g.kd_pilihan = bk.id_pilihan");                                      
+                                        $querybasiskasus = mysql_query("SELECT * FROM relasi bk, gejala g WHERE bk.no_relasi = '$datakasus[no_relasi]' and g.kd_pilihan = bk.kd_pilihan and NOT (bobot = 0)");
                                         $jml_gejala_kasus = 0;
 										
                                          while ($databasiskasus = mysql_fetch_array($querybasiskasus)) {
@@ -222,19 +310,15 @@
                                                 // ambil bobot untuk gejala tersebut
                                                 $jml_gejala_cocok++;
 												$bobotcocok += $databasiskasus['bobot']; 
-												
-//                                                for ($i = 0; $i < $jml_gejala_cocok; $i++) {
-//                                                $bot = $databasiskasus['bobot'];
-//                                                }  
 
                                             }
                                         }
-                                    }
+                                    
                                 }
-
-
+							
+							
 							//Hasil nilai
-                                $hasil = 0;
+                               $hasil = 0;
                                 $hasil = $bobotcocok / $datakasus['total'];			
                                 $nilai_hasil[$i] = $hasil;
 
@@ -253,7 +337,7 @@
                                
 							   // echo $datakasus['no_relasi']." = ".$jml_gejala_cocok." / ".$pembagi." = ".$hasil."<br/>";
                                
- 							    echo "<td bgcolor=\"#FFFFFF\"><strong>" . $datakasus['no_relasi'] . "</strong></td>";  //No Kasus (good)
+ 							   echo "<td bgcolor=\"#FFFFFF\"><strong>" . $datakasus['no_relasi'] . "</strong></td>";  //No Kasus (good)
                                 echo "<td bgcolor=\"#FFFFFF\"><strong>" . $jml_gejala_cocok . " kriteria</strong></td>";  //Kriteria Cocok (good)
 								echo "<td bgcolor=\"#FFFFFF\"><strong>" . $bobotcocok . "</strong></td>"; // bobot yang cocok
                                 echo "<td bgcolor=\"#FFFFFF\"><strong>" . $datakasus['total'] . "</strong></td>"; // total bobot (good)
@@ -301,15 +385,9 @@
                             //	echo $daftar_penyakit[$i]."=".$daftar_cf[$i]."<br/>";
                             // algoritmanya disini --------------------------------------------------------------------------------------------}
                             ?>
-
-
-
-
-
                         </div>
 
                         <br/><br/> <strong>---------------------------------------------------------------------------------------------------------------------</strong>   <br/><br/>
-
                         <br />
                      
                         <br />
@@ -343,7 +421,7 @@
                         Paket menu Terpilih = <?php echo $nama_paket_hasil[0]; ?> pada Kasus Nomor <?php echo $no_kasus_hasil[0]; ?>, dengan Nilai Persentase Terbesar = <?php echo round($nilai_hasil[0] * 100, 2); ?> %
                         <br />
                         <br />	
-                        <?php
+                      <?php
                     }
                     ?>
                 </td>
