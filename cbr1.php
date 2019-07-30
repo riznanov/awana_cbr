@@ -43,7 +43,7 @@
         <table width="700" border="0" align="center" cellpadding="0" cellspacing="1" bgcolor="#000099">
             <tr>
                 <td align="center" valign="top" bgcolor="#FFFFFF"><br />
-                    <strong>Analisa Menggunakan Sistem Pakar Metode CBR (Case Based Reasoning)</strong><br />
+                    <strong>Analisa Menggunakan Metode CBR (Case Based Reasoning)</strong><br />
                     <br />
                     <?php
                     if (!isset($_POST['submit'])) {
